@@ -1,0 +1,2 @@
+export WORKDIR=/go/src/$(basename $(pwd))
+docker run --workdir $WORKDIR --entrypoint golangci-lint --rm -it -v "$PWD":"$WORKDIR" golangci/golangci-lint:latest $@
