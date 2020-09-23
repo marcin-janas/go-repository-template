@@ -1,28 +1,31 @@
-GOCMD=scripts/go
+GO_CMD=scripts/go
 GOLANGCI_LINT=scripts/golangci-lint
 
-GOMODINIT=$(GOCMD) mod init
-GOMODTIDY=$(GOCMD) mod tidy
-GORUN=$(GOCMD) run .
-GOBUILD=$(GOCMD) build .
-GOCLEAN=$(GOCMD) clean
-GOTEST=$(GOCMD) test -v --cover ./...
+GO_DOCKER_BUILD=docker build . -t go
+
+GO_MOD_INIT=$(GO_CMD) mod init
+GO_MOD_TIDY=$(GO_CMD) mod tidy
+
+GO_RUN=$(GO_CMD) run -race .
+GO_BUILD=$(GO_CMD) build .
+GO_CLEAN=$(GO_CMD) clean
+GO_TEST=$(GO_CMD) test -race -v --cover ./...
+
 GOLINT=$(GOLANGCI_LINT) run
 
 all: lint test run
 init:
-	@$(GOMODINIT)
+	@$(GO_DOCKER_BUILD)
+	@$(GO_MOD_INIT)
 tidy:
-	@$(GOMODTIDY)
+	@$(GO_MOD_TIDY)
 build:
-	@GOOS=$(shell uname|tr '[A-Z]' '[a-z]') $(GOBUILD)
-cover:
-	@$(GOCOVER)
+	@CGO_ENABLED=0 GOOS=$(shell uname|tr '[A-Z]' '[a-z]') $(GO_BUILD)
 clean:
-	@$(GOCLEAN)
+	@$(GO_CLEAN)
 run:
-	@$(GORUN)
+	@CGO_ENABLED=1 $(GO_RUN)
 test:
-	@$(GOTEST)
+	@CGO_ENABLED=1 $(GO_TEST)
 lint:
-	@$(GOLINT)
+	@$(GO_LINT)

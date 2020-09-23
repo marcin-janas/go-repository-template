@@ -1,2 +1,2 @@
 export WORKDIR=/go/src/$(basename $(pwd))
-docker run --workdir $WORKDIR --entrypoint go --rm -it -e GOOS -v "$PWD":"$WORKDIR" golang:alpine $@
+docker run --workdir $WORKDIR --entrypoint go --rm -it -e CGO_ENABLED -e GOOS -v "$PWD":"$WORKDIR" go $@
